@@ -25,10 +25,10 @@ namespace TimetableWebCrawler
 
             public string name;
             string type;
-            string time;
+            public string time;
             string room;
             string teacher;
-            string comments;
+            public string comments;
 
             public override string ToString()
             {
@@ -189,6 +189,12 @@ namespace TimetableWebCrawler
                                 room = "";
                                 comments = lines[1] + ", " + lines[2];
                             }
+                            else if (name.Contains("Mech"))
+                            {
+                                room = FormatBuilding(lines[2]);
+                                time = time.Substring(0, 4) + lines[1];
+                                comments = "";
+                            }
                             else
                             {
                                 room = lines[2].Contains("Pok") ? lines[2] : FormatBuilding(lines[2]);
@@ -232,6 +238,12 @@ namespace TimetableWebCrawler
                         }
                         if (result.week[i].Any() && result.week[i].Last().name == name)
                             continue;
+                        if (comments.Contains(":"))
+                        {
+                            comments = comments.Contains("Zaj") ? comments.Substring(5) : comments;
+                            comments.Replace(" ", "");
+                            time = time.Substring(0, 4) + comments;
+                        }
                         item = new Timetable.TimetableItem(name, time, room, comments: comments);
                         result.week[i].Add(item);
                     }
