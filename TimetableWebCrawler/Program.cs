@@ -55,7 +55,7 @@ namespace TimetableWebCrawler
             string result = "";
             result += DateTime.Now.ToString("dd.MM.yyyy HH:mm");
             result += "\n";
-            result += header;
+            result += header + " ;";
             result += "\n------------------------------------------------";
             int counter = 1;
             foreach (var day in week)
@@ -95,7 +95,7 @@ namespace TimetableWebCrawler
                 ExportTimetableToFile(timetable);
                 Console.Write(".");
             }
-            Console.WriteLine("\nfiles saved");
+            Console.WriteLine("\nfiles generation finished");
 
             Console.WriteLine("press any key to exit");
             Console.ReadKey();
@@ -135,16 +135,17 @@ namespace TimetableWebCrawler
             string[] stuff = Regex.Split(body[0].InnerHtml, "<br>");
             string[] line1 = stuff[0].Replace("\n", "")
                 .Replace("s ", "s.").Replace("gr.", "gr ").Replace("  ", " ").Split(' ');
-            if (line1.Length == 5)
-            {
-                header += line1[3] + line1[4] + ", ";
-            } else
-            {
-                header += line1[3] + ", ";
-            }
-            header += "inż, ";
+
+            string spec = line1[3].Split('/')[0];
+            header += spec + ", ";
+            bool inz = line1[3].Split('/')[1] == "I";
+            header += inz ? "inż, " : "mgr, ";
             header += GetSemesterYear(line1[2]);
             header += ("gr" + body[0].InnerText[2]);
+            if (line1.Length == 5)
+            {
+                header += ", " + line1[4] + "_" + body[0].InnerText[2];
+            }
             result = new Timetable(header);
 
             foreach (var row in rows)
